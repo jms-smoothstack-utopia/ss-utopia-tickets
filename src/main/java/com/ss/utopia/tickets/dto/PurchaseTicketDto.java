@@ -1,0 +1,41 @@
+package com.ss.utopia.tickets.dto;
+
+import com.ss.utopia.tickets.entity.Ticket;
+import com.ss.utopia.tickets.entity.Ticket.TicketStatus;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class PurchaseTicketDto {
+
+  @NotNull
+  private Long purchaserId;
+
+  @NotNull
+  private Long flightId;
+
+  @NotEmpty
+  private List<TicketItem> tickets;
+
+  public List<Ticket> mapToEntity() {
+    return tickets.stream()
+        .map(ticket -> Ticket.builder()
+            .purchaserId(purchaserId)
+            .flightId(flightId)
+            .passengerName(ticket.getPassengerName())
+            .seatClass(ticket.getSeatClass())
+            .seatNumber(ticket.getSeatNumber())
+            .status(TicketStatus.PURCHASED)
+            .build())
+        .collect(Collectors.toList());
+  }
+}
