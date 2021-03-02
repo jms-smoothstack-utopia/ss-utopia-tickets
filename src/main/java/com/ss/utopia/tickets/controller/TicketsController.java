@@ -6,6 +6,8 @@ import com.ss.utopia.tickets.service.TicketService;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,8 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
-@RequestMapping("/tickets")
+@RequestMapping(EndpointConstants.TICKETS_ENDPOINT)
 public class TicketsController {
 
   private final TicketService service;
@@ -28,6 +31,7 @@ public class TicketsController {
 
   @GetMapping(produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<List<Ticket>> getAllTickets() {
+    log.info("GET all");
     List<Ticket> tickets = service.getAllTickets();
     if (tickets.isEmpty()) {
       return ResponseEntity.noContent().build();
@@ -38,17 +42,20 @@ public class TicketsController {
   @GetMapping(value = "/{id}",
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<Ticket> getTicketById(@PathVariable Long id) {
+    log.info("GET id=" + id);
     return ResponseEntity.of(Optional.ofNullable(service.getTicketById(id)));
   }
 
   @PostMapping
   public ResponseEntity<List<Ticket>> purchaseTickets(@Valid @RequestBody PurchaseTicketDto purchaseTicketDto) {
+    log.info("POST new ticket");
     var tickets = service.purchaseTickets(purchaseTicketDto);
-    return ResponseEntity.status(201).body(tickets);
+    return ResponseEntity.status(HttpStatus.CREATED).body(tickets);
   }
 
   @PutMapping("/{id}")
   public ResponseEntity<?> checkIn(@PathVariable Long id) {
+    log.info("PUT id=" + id);
     //todo add ability to update multiple tickets
     // also, should take a DTO of the status and not be limited to just checkin
     service.checkIn(id);
