@@ -7,16 +7,14 @@ import com.ss.utopia.tickets.exception.NoSuchTicketException;
 import com.ss.utopia.tickets.repository.TicketsRepository;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class TicketsServiceImpl implements TicketService {
 
   private final TicketsRepository repository;
-
-  public TicketsServiceImpl(TicketsRepository repository) {
-    this.repository = repository;
-  }
 
   @Override
   public List<Ticket> getAllTickets() {
