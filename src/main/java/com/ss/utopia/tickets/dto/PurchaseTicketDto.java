@@ -3,6 +3,7 @@ package com.ss.utopia.tickets.dto;
 import com.ss.utopia.tickets.entity.Ticket;
 import com.ss.utopia.tickets.entity.Ticket.TicketStatus;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -18,7 +19,7 @@ import lombok.NoArgsConstructor;
 public class PurchaseTicketDto {
 
   @NotNull
-  private Long purchaserId;
+  private UUID purchaserId;
 
   @NotNull
   private Long flightId;

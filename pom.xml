@@ -17,6 +17,8 @@
   <properties>
     <java.version>11</java.version>
     <spring-cloud.version>2020.0.1</spring-cloud.version>
+    <docker.image.prefix>ss-utopia</docker.image.prefix>
+    <docker.image.name>tickets-service</docker.image.name>
   </properties>
 
   <dependencies>
@@ -53,12 +55,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <scope>runtime</scope>
@@ -79,6 +75,25 @@
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+    </dependency>
+
+    <!-- SECURITY DEPENDENCIES -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/com.auth0/java-jwt -->
+    <dependency>
+      <groupId>com.auth0</groupId>
+      <artifactId>java-jwt</artifactId>
+      <version>3.11.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-test</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -106,6 +121,32 @@
               <artifactId>lombok</artifactId>
             </exclude>
           </excludes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <version>0.33.0</version>
+        <configuration>
+          <verbose>true</verbose>
+          <images>
+            <image>
+              <name>${docker.image.prefix}/${docker.image.name}</name>
+              <alias>${project.artifactId}</alias>
+              <registry>247293358719.dkr.ecr.us-east-1.amazonaws.com</registry>
+              <build>
+                <assembly>
+                  <descriptorRef>artifact</descriptorRef>
+                </assembly>
+                <dockerFile>Dockerfile</dockerFile>
+                <tags>
+                  <tag>latest</tag>
+                  <tag>${project.version}</tag>
+                </tags>
+              </build>
+            </image>
+          </images>
         </configuration>
       </plugin>
     </plugins>
