@@ -41,14 +41,6 @@ public class Ticket {
   @NotNull
   private TicketStatus status;
 
-  public String getPassenger() {
-    return null;
-  }
-
-  public Long getCustomerId() {
-    return null;
-  }
-
   public enum TicketStatus {
     PURCHASED,
     CHECKED_IN,

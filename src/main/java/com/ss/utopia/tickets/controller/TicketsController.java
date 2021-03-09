@@ -42,17 +42,17 @@ public class TicketsController {
   }
 
   @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE','TRAVEL_AGENT')"
-      + " OR @customerAuthenticationManager.customerIdMatches(#id)")
-  @GetMapping(value = "/{id}",
+      + " OR @customerAuthenticationManager.customerIdMatches(authentication, #ticketId)")
+  @GetMapping(value = "/{ticketId}",
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-  public ResponseEntity<Ticket> getTicketById(@PathVariable Long id) {
-    log.info("GET id=" + id);
-    return ResponseEntity.of(Optional.ofNullable(service.getTicketById(id)));
+  public ResponseEntity<Ticket> getTicketById(@PathVariable Long ticketId) {
+    log.info("GET id=" + ticketId);
+    return ResponseEntity.of(Optional.ofNullable(service.getTicketById(ticketId)));
   }
 
   //todo limit to only customer?
   @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE','TRAVEL_AGENT')"
-      + " OR @customerAuthenticationManager.customerIdMatches(#purchaseTicketDto)")
+      + " OR @customerAuthenticationManager.customerIdMatches(authentication, #purchaseTicketDto)")
   @PostMapping
   public ResponseEntity<List<Ticket>> purchaseTickets(@Valid @RequestBody PurchaseTicketDto purchaseTicketDto) {
     log.info("POST new ticket");
