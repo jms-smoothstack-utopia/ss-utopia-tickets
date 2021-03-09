@@ -1,5 +1,6 @@
 package com.ss.utopia.tickets.entity;
 
+import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -26,7 +27,7 @@ public class Ticket {
   private Long flightId;
 
   @NotNull
-  private Long purchaserId;
+  private UUID purchaserId;
 
   @NotBlank
   private String passengerName;
