@@ -7,7 +7,7 @@ import com.ss.utopia.tickets.exception.NoSuchTicketException;
 import com.ss.utopia.tickets.repository.TicketsRepository;
 
 import java.time.Instant;
-import java.time.chrono.ChronoZonedDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,7 +29,7 @@ public class TicketsServiceImpl implements TicketService {
   public List<Ticket> getPastTicketsByCustomerId(UUID customerId) {
     return repository.findByPurchaserId(customerId)
             .stream()
-            .filter(thisTicket -> thisTicket.getFlightTime().isBefore(ChronoZonedDateTime.from(Instant.now())))
+            .filter(thisTicket -> thisTicket.getFlightTime().isBefore(ZonedDateTime.now()))
             .collect(Collectors.toList());
   }
 
@@ -37,7 +37,7 @@ public class TicketsServiceImpl implements TicketService {
   public List<Ticket> getUpcomingTicketsByCustomerId(UUID customerId) {
     return repository.findByPurchaserId(customerId)
             .stream()
-            .filter(thisTicket -> thisTicket.getFlightTime().isAfter(ChronoZonedDateTime.from(Instant.now())))
+            .filter(thisTicket -> thisTicket.getFlightTime().isAfter(ZonedDateTime.now()))
             .collect(Collectors.toList());
   }
 
