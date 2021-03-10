@@ -5,6 +5,7 @@ import com.ss.utopia.tickets.repository.TicketsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -27,6 +28,15 @@ public class CustomerAuthenticationManager {
       return ticketsRepository.findById(ticketId)
           .map(t -> t.getPurchaserId().equals(jwtPrincipal.getUserId()))
           .orElse(false);
+    } catch (ClassCastException ex) {
+      return false;
+    }
+  }
+
+  public boolean customerIdMatches(Authentication authentication, UUID customerId) {
+    try {
+      var jwtPrincipal = (JwtPrincipal) authentication.getPrincipal();
+      return jwtPrincipal.getUserId().equals(customerId);
     } catch (ClassCastException ex) {
       return false;
     }

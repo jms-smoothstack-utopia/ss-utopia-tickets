@@ -5,7 +5,11 @@ import com.ss.utopia.tickets.entity.Ticket;
 import com.ss.utopia.tickets.entity.Ticket.TicketStatus;
 import com.ss.utopia.tickets.exception.NoSuchTicketException;
 import com.ss.utopia.tickets.repository.TicketsRepository;
+
+import java.time.Instant;
+import java.time.chrono.ChronoZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +23,22 @@ public class TicketsServiceImpl implements TicketService {
   @Override
   public List<Ticket> getAllTickets() {
     return repository.findAll();
+  }
+
+  @Override
+  public List<Ticket> getPastTicketsByCustomerId(UUID customerId) {
+    return repository.findByPurchaserId(customerId)
+            .stream()
+            .filter(thisTicket -> thisTicket.getFlightTime().isBefore(ChronoZonedDateTime.from(Instant.now())))
+            .collect(Collectors.toList());
+  }
+
+  @Override
+  public List<Ticket> getUpcomingTicketsByCustomerId(UUID customerId) {
+    return repository.findByPurchaserId(customerId)
+            .stream()
+            .filter(thisTicket -> thisTicket.getFlightTime().isAfter(ChronoZonedDateTime.from(Instant.now())))
+            .collect(Collectors.toList());
   }
 
   @Override

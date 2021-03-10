@@ -1,5 +1,6 @@
 package com.ss.utopia.tickets.entity;
 
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,6 +26,9 @@ public class Ticket {
 
   @NotNull
   private Long flightId;
+
+  @NotNull
+  private ZonedDateTime flightTime;
 
   @NotNull
   private UUID purchaserId;
