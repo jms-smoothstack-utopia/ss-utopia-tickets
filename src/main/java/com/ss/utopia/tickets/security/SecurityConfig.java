@@ -3,6 +3,7 @@ package com.ss.utopia.tickets.security;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,6 +27,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
         .requestMatchers(CorsUtils::isCorsRequest).permitAll()
+        .antMatchers(HttpMethod.GET, "/api-docs").permitAll()
         .anyRequest().authenticated()
         .and()
         .addFilter(new JwtAuthenticationVerificationFilter(authenticationManagerBean(),
