@@ -7,6 +7,7 @@ import com.ss.utopia.tickets.security.permissions.EmployeeOnlyPermission;
 import com.ss.utopia.tickets.service.TicketService;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +40,32 @@ public class TicketsController {
       return ResponseEntity.noContent().build();
     }
     return ResponseEntity.ok(tickets);
+  }
+
+  @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE','TRAVEL_AGENT')"
+          + " OR @customerAuthenticationManager.customerIdMatches(authentication, #customerId)")
+  @GetMapping(value = "/history/{customerId}",
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  public ResponseEntity<List<Ticket>> getPastTicketsForCustomer(@PathVariable UUID customerId) {
+    log.info("GET past tickets for customer=" + customerId);
+    List<Ticket> pastTickets = service.getPastTicketsByCustomerId(customerId);
+    if (pastTickets.isEmpty()) {
+      return ResponseEntity.noContent().build();
+    }
+    return ResponseEntity.ok(pastTickets);
+  }
+
+  @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE','TRAVEL_AGENT')"
+          + " OR @customerAuthenticationManager.customerIdMatches(authentication, #customerId)")
+  @GetMapping(value = "/upcoming/{customerId}",
+          produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+  public ResponseEntity<List<Ticket>> getUpcomingTicketsForCustomer(@PathVariable UUID customerId) {
+    log.info("GET upcoming tickets for customer=" + customerId);
+    List<Ticket> upcomingTickets = service.getUpcomingTicketsByCustomerId(customerId);
+    if (upcomingTickets.isEmpty()) {
+      return ResponseEntity.noContent().build();
+    }
+    return ResponseEntity.ok(upcomingTickets);
   }
 
   @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE','TRAVEL_AGENT')"

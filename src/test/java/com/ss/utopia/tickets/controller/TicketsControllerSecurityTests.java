@@ -18,7 +18,9 @@ import com.ss.utopia.tickets.repository.TicketsRepository;
 import com.ss.utopia.tickets.security.SecurityConstants;
 import com.ss.utopia.tickets.service.TicketService;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -52,9 +54,13 @@ public class TicketsControllerSecurityTests {
 
   MockMvc mvc;
 
+  LocalDateTime mockFlightTime = LocalDateTime.of(2021, 11, 11, 11, 11);
+  ZonedDateTime mockZonedTime = ZonedDateTime.of(mockFlightTime, ZoneId.of("America/New_York"));
+
   Ticket mockTicket = Ticket.builder()
       .id(1L)
       .flightId(1L)
+      .flightTime(mockZonedTime)
       .purchaserId(UUID.fromString("a4a9feca-bfe7-4c45-8319-7cb6cdd359db"))
       .passengerName("John Tester")
       .seatClass("executive")
