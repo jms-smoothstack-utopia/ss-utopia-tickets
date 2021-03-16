@@ -26,8 +26,7 @@
       **/exception/*.java,
       **/bootstrap/*.java,
       **/controller/EndpointConstants.java,
-      **/security/SecurityConstants.java,
-      **/security/JwtPrincipal.java,
+      **/security/*.java,
       **/TicketsApplication.java
     </sonar.coverage.exclusions>
   </properties>

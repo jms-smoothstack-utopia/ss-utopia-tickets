@@ -53,6 +53,7 @@ pipeline {
     post {
         always {
             sh 'mvn clean -Ddocker.removeMode=all docker:remove'
+            sh 'docker system prune -f'
 
         }
     }

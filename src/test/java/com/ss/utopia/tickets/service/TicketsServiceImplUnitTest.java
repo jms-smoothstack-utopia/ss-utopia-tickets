@@ -1,4 +1,4 @@
-package com.ss.utopia.tickets.controller;
+package com.ss.utopia.tickets.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import com.ss.utopia.tickets.dto.PurchaseTicketDto;
+import com.ss.utopia.tickets.dto.TicketItem;
 import com.ss.utopia.tickets.exception.NoSuchTicketException;
 import com.ss.utopia.tickets.repository.TicketsRepository;
 import com.ss.utopia.tickets.entity.Ticket;
@@ -123,6 +125,36 @@ class TicketsServiceImplUnitTest {
         service.checkIn(futureTicket.getId());
         var ticket = service.getTicketById(futureTicket.getId());
         assertEquals(Ticket.TicketStatus.CHECKED_IN, futureTicket.getStatus());
+    }
+
+    @Test
+    void test_getAllTickets_ReturnsAllTickets() {
+        when(repository.findAll()).thenReturn(List.of(firstTicket, pastTicket, futureTicket));
+
+        var tickets = service.getAllTickets();
+        var expectedTickets = List.of(firstTicket, pastTicket, futureTicket);
+
+        assertEquals(expectedTickets, tickets);
+    }
+
+    @Test
+    void test_purchaseTickets_returnsPurchasedTickets() {
+        PurchaseTicketDto mockDto = PurchaseTicketDto.builder()
+                .flightId(1L)
+                .purchaserId(firstTicket.getPurchaserId())
+                .tickets(List.of(TicketItem.builder()
+                        .seatClass(firstTicket.getSeatClass())
+                        .seatNumber(firstTicket.getSeatNumber())
+                        .passengerName(firstTicket.getPassengerName())
+                        .build()))
+                .build();
+
+        when(repository.save(mockDto.mapToEntity().get(0))).thenReturn(firstTicket);
+
+        var purchasedTickets = service.purchaseTickets(mockDto);
+        var expectedTickets = List.of(firstTicket);
+
+        assertEquals(expectedTickets, purchasedTickets);
     }
 
 }

@@ -54,8 +54,11 @@ public class TicketsControllerSecurityTests {
 
   MockMvc mvc;
 
-  LocalDateTime mockFlightTime = LocalDateTime.of(2021, 11, 11, 11, 11);
+  LocalDateTime mockFlightTime = LocalDateTime.of(3021, 11, 11, 11, 11);
   ZonedDateTime mockZonedTime = ZonedDateTime.of(mockFlightTime, ZoneId.of("America/New_York"));
+
+  LocalDateTime mockPastTime = LocalDateTime.of(2020, 11, 11, 11, 11);
+  ZonedDateTime mockZonedPastTime = ZonedDateTime.of(mockPastTime, ZoneId.of("America/New_York"));
 
   Ticket mockTicket = Ticket.builder()
       .id(1L)
@@ -67,6 +70,17 @@ public class TicketsControllerSecurityTests {
       .seatNumber("1A")
       .status(TicketStatus.PURCHASED)
       .build();
+
+  Ticket mockPastTicket = Ticket.builder()
+          .id(2L)
+          .flightId(1L)
+          .flightTime(mockZonedPastTime)
+          .purchaserId(UUID.fromString("a4a9feca-bfe7-4c45-8319-7cb6cdd359db"))
+          .passengerName("John Tester")
+          .seatClass("executive")
+          .seatNumber("1A")
+          .status(TicketStatus.PURCHASED)
+          .build();
 
   PurchaseTicketDto mockDto = PurchaseTicketDto.builder()
       .flightId(1L)
@@ -100,6 +114,10 @@ public class TicketsControllerSecurityTests {
     when(ticketService.getAllTickets()).thenReturn(List.of(mockTicket));
     when(ticketService.getTicketById(mockTicket.getId())).thenReturn(mockTicket);
     when(ticketService.purchaseTickets(mockDto)).thenReturn(List.of(mockTicket));
+    when(ticketService.getUpcomingTicketsByCustomerId(UUID.fromString(MockUser.MATCH_CUSTOMER.id)))
+            .thenReturn(List.of(mockTicket));
+    when(ticketService.getPastTicketsByCustomerId(UUID.fromString(MockUser.MATCH_CUSTOMER.id)))
+            .thenReturn(List.of(mockPastTicket));
 
     when(ticketsRepository.findById(mockTicket.getId())).thenReturn(Optional.of(mockTicket));
   }
@@ -235,6 +253,70 @@ public class TicketsControllerSecurityTests {
         .perform(
             put(EndpointConstants.API_V_0_1_TICKETS + "/" + mockTicket.getId()))
         .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void test_getUpcomingTicketsForCustomer_CanOnlyBePerformedByAuthedUsersOrPurchaser() throws Exception {
+    var alwaysAuthed = List.of(MockUser.ADMIN,
+            MockUser.TRAVEL_AGENT,
+            MockUser.EMPLOYEE,
+            MockUser.MATCH_CUSTOMER);
+
+    for (var user : alwaysAuthed) {
+      mvc
+              .perform(
+                      get(EndpointConstants.API_V_0_1_TICKETS + "/upcoming/"
+                              + MockUser.MATCH_CUSTOMER.id)
+                              .header("Authorization", getJwt(user)))
+              .andExpect(status().isOk());
+    }
+
+    var unauthed = List.of(MockUser.DEFAULT, MockUser.UNMATCH_CUSTOMER);
+    for (var user : unauthed) {
+      mvc
+              .perform(
+                      get(EndpointConstants.API_V_0_1_TICKETS + "/upcoming/"
+                              + MockUser.MATCH_CUSTOMER.id)
+                              .header("Authorization", getJwt(user)))
+              .andExpect(status().isForbidden());
+    }
+    mvc
+            .perform(
+                    get(EndpointConstants.API_V_0_1_TICKETS + "/upcoming/"
+                            + MockUser.MATCH_CUSTOMER.id))
+            .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void test_getPastTicketsForCustomer_CanOnlyBePerformedByAuthedUsersOrPurchaser() throws Exception {
+    var alwaysAuthed = List.of(MockUser.ADMIN,
+            MockUser.TRAVEL_AGENT,
+            MockUser.EMPLOYEE,
+            MockUser.MATCH_CUSTOMER);
+
+    for (var user : alwaysAuthed) {
+      mvc
+              .perform(
+                      get(EndpointConstants.API_V_0_1_TICKETS + "/history/"
+                              + MockUser.MATCH_CUSTOMER.id)
+                              .header("Authorization", getJwt(user)))
+              .andExpect(status().isOk());
+    }
+
+    var unauthed = List.of(MockUser.DEFAULT, MockUser.UNMATCH_CUSTOMER);
+    for (var user : unauthed) {
+      mvc
+              .perform(
+                      get(EndpointConstants.API_V_0_1_TICKETS + "/history/"
+                              + MockUser.MATCH_CUSTOMER.id)
+                              .header("Authorization", getJwt(user)))
+              .andExpect(status().isForbidden());
+    }
+    mvc
+            .perform(
+                    get(EndpointConstants.API_V_0_1_TICKETS + "/history/"
+                            + MockUser.MATCH_CUSTOMER.id))
+            .andExpect(status().isForbidden());
   }
 
   enum MockUser {
