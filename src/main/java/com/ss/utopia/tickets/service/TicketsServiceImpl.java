@@ -5,8 +5,6 @@ import com.ss.utopia.tickets.entity.Ticket;
 import com.ss.utopia.tickets.entity.Ticket.TicketStatus;
 import com.ss.utopia.tickets.exception.NoSuchTicketException;
 import com.ss.utopia.tickets.repository.TicketsRepository;
-
-import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;

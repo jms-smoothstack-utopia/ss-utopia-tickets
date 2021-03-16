@@ -77,11 +77,11 @@ public class TicketsController {
     return ResponseEntity.of(Optional.ofNullable(service.getTicketById(ticketId)));
   }
 
-  //todo limit to only customer?
   @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE','TRAVEL_AGENT')"
       + " OR @customerAuthenticationManager.customerIdMatches(authentication, #purchaseTicketDto)")
   @PostMapping
-  public ResponseEntity<List<Ticket>> purchaseTickets(@Valid @RequestBody PurchaseTicketDto purchaseTicketDto) {
+  public ResponseEntity<List<Ticket>> purchaseTickets(
+          @Valid @RequestBody PurchaseTicketDto purchaseTicketDto) {
     log.info("POST new ticket");
     var tickets = service.purchaseTickets(purchaseTicketDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(tickets);
@@ -89,10 +89,9 @@ public class TicketsController {
 
   @EmployeeOnlyPermission
   @PutMapping("/{id}")
-  public ResponseEntity<?> checkIn(@PathVariable Long id) {
+  //Ticket type not strictly necessary since this only returns 204
+  public ResponseEntity<Ticket> checkIn(@PathVariable Long id) {
     log.info("PUT id=" + id);
-    //todo add ability to update multiple tickets
-    // also, should take a DTO of the status and not be limited to just checkin
     service.checkIn(id);
     return ResponseEntity.noContent().build();
   }
