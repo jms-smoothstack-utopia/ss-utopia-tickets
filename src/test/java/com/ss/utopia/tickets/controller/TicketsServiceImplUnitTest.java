@@ -107,7 +107,7 @@ class TicketsServiceImplUnitTest {
         when(repository.findById(firstTicket.getId())).thenReturn(Optional.of(firstTicket));
 
         var ticket = service.getTicketById(firstTicket.getId());
-        assertEquals(ticket, firstTicket);
+        assertEquals(firstTicket, ticket);
     }
 
     @Test
@@ -122,7 +122,7 @@ class TicketsServiceImplUnitTest {
 
         service.checkIn(futureTicket.getId());
         var ticket = service.getTicketById(futureTicket.getId());
-        assertEquals(futureTicket.getStatus(), Ticket.TicketStatus.CHECKED_IN);
+        assertEquals(Ticket.TicketStatus.CHECKED_IN, futureTicket.getStatus());
     }
 
 }

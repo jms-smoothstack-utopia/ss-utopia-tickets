@@ -2,10 +2,10 @@ package com.ss.utopia.tickets.security;
 
 import com.ss.utopia.tickets.dto.PurchaseTicketDto;
 import com.ss.utopia.tickets.repository.TicketsRepository;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -13,7 +13,8 @@ public class CustomerAuthenticationManager {
 
   private final TicketsRepository ticketsRepository;
 
-  public boolean customerIdMatches(Authentication authentication, PurchaseTicketDto purchaseTicketDto) {
+  public boolean customerIdMatches(Authentication authentication,
+                                   PurchaseTicketDto purchaseTicketDto) {
     try {
       var jwtPrincipal = (JwtPrincipal) authentication.getPrincipal();
       return jwtPrincipal.getUserId().equals(purchaseTicketDto.getPurchaserId());
