@@ -26,4 +26,16 @@ public class ExceptionControllerAdvisor {
 
     return response;
   }
+
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ExceptionHandler(BadStatusUpdateException.class)
+  public Map<String, Object> badStatusUpdateException(BadStatusUpdateException ex) {
+    LOGGER.error(ex.getMessage());
+    var response = new HashMap<String, Object>();
+
+    response.put("error", ex.getMessage());
+    response.put("status", HttpStatus.BAD_REQUEST);
+
+    return response;
+  }
 }

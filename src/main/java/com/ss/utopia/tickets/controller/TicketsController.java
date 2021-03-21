@@ -87,6 +87,15 @@ public class TicketsController {
     return ResponseEntity.status(HttpStatus.CREATED).body(tickets);
   }
 
+  @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE','TRAVEL_AGENT')"
+      + " OR @customerAuthenticationManager.customerIdMatches(authentication, #ticketId)")
+  @PutMapping("/cancel/{ticketId}")
+  public ResponseEntity<Ticket> cancelTicket(@PathVariable Long ticketId) {
+    log.info("PUT cancel ticket id=" + ticketId);
+    service.cancelTicket(ticketId);
+    return ResponseEntity.noContent().build();
+  }
+
   @EmployeeOnlyPermission
   @PutMapping("/{id}")
   //Ticket type not strictly necessary since this only returns 204
