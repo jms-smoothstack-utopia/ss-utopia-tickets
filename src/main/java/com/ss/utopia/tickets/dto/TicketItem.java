@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.ZonedDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,4 +20,6 @@ public class TicketItem {
   private String seatNumber;
   @NotBlank
   private String passengerName;
+  @NotBlank
+  private ZonedDateTime flightTime;
 }
