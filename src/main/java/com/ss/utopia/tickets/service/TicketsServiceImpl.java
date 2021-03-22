@@ -3,6 +3,7 @@ package com.ss.utopia.tickets.service;
 import com.ss.utopia.tickets.dto.PurchaseTicketDto;
 import com.ss.utopia.tickets.entity.Ticket;
 import com.ss.utopia.tickets.entity.Ticket.TicketStatus;
+import com.ss.utopia.tickets.exception.BadStatusUpdateException;
 import com.ss.utopia.tickets.exception.NoSuchTicketException;
 import com.ss.utopia.tickets.repository.TicketsRepository;
 import java.time.ZonedDateTime;
@@ -51,6 +52,18 @@ public class TicketsServiceImpl implements TicketService {
         .stream()
         .map(repository::save)
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public void cancelTicket(Long ticketId) {
+    var ticket = getTicketById(ticketId);
+    var status = ticket.getStatus();
+    if (status == TicketStatus.CANCELLED) {
+      throw new BadStatusUpdateException(ticketId, status, TicketStatus.CANCELLED);
+    }
+    ticket.setStatus(TicketStatus.CANCELLED);
+    //for future payment integration: fire off a refund request to the processor here
+    repository.save(ticket);
   }
 
   @Override

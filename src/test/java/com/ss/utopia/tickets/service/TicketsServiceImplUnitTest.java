@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.ss.utopia.tickets.dto.PurchaseTicketDto;
 import com.ss.utopia.tickets.dto.TicketItem;
+import com.ss.utopia.tickets.exception.BadStatusUpdateException;
 import com.ss.utopia.tickets.exception.NoSuchTicketException;
 import com.ss.utopia.tickets.repository.TicketsRepository;
 import com.ss.utopia.tickets.entity.Ticket;
@@ -35,6 +36,7 @@ class TicketsServiceImplUnitTest {
     private static Ticket firstTicket;
     private static Ticket pastTicket;
     private static Ticket futureTicket;
+    private static Ticket cancelledTicket;
     private final static UUID customerId = UUID.randomUUID();
     private final static ZonedDateTime mockTime = ZonedDateTime.now(ZoneId.of("America/New_York"));
     private final static ZonedDateTime mockPast = mockTime.minus(6, ChronoUnit.MONTHS);
@@ -73,6 +75,16 @@ class TicketsServiceImplUnitTest {
                 .seatClass("Executive")
                 .seatNumber("1A")
                 .status(Ticket.TicketStatus.PURCHASED)
+                .build();
+        cancelledTicket = Ticket.builder()
+                .id(4L)
+                .flightId(4L)
+                .flightTime(mockFuture)
+                .purchaserId(customerId)
+                .passengerName("Test Customer")
+                .seatClass("Executive")
+                .seatNumber("1A")
+                .status(Ticket.TicketStatus.CANCELLED)
                 .build();
 
     }
@@ -125,6 +137,23 @@ class TicketsServiceImplUnitTest {
         service.checkIn(futureTicket.getId());
         var ticket = service.getTicketById(futureTicket.getId());
         assertEquals(Ticket.TicketStatus.CHECKED_IN, futureTicket.getStatus());
+    }
+
+    @Test
+    void test_cancelTicket_CancelsTicket() {
+        when(repository.findById(futureTicket.getId())).thenReturn(Optional.of(futureTicket));
+
+        service.cancelTicket(futureTicket.getId());
+        var ticket = service.getTicketById(futureTicket.getId());
+        assertEquals(Ticket.TicketStatus.CANCELLED, futureTicket.getStatus());
+    }
+
+    @Test
+    void test_cancelTicket_ThrowsExceptionOnAlreadyCancelledTicket() {
+        when(repository.findById(cancelledTicket.getId())).thenReturn(Optional.of(cancelledTicket));
+
+        assertThrows(BadStatusUpdateException.class, () ->
+                service.cancelTicket(cancelledTicket.getId()));
     }
 
     @Test
