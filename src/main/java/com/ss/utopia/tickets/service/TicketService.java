@@ -18,4 +18,6 @@ public interface TicketService {
   List<Ticket> purchaseTickets(PurchaseTicketDto purchaseTicketDto);
 
   void checkIn(Long ticketId);
+
+  void cancelTicket(Long ticketId);
 }

@@ -319,6 +319,37 @@ public class TicketsControllerSecurityTests {
             .andExpect(status().isForbidden());
   }
 
+  @Test
+  void test_cancelTicket_CanOnlyBePerformedByAuthedUsersOrPurchaser() throws Exception {
+    var alwaysAuthed = List.of(MockUser.ADMIN,
+            MockUser.TRAVEL_AGENT,
+            MockUser.EMPLOYEE,
+            MockUser.MATCH_CUSTOMER);
+    for (var user : alwaysAuthed) {
+      mvc
+              .perform(
+                      put(EndpointConstants.API_V_0_1_TICKETS + "/cancel/"
+                              + mockTicket.getId())
+                              .header("Authorization", getJwt(user)))
+              .andExpect(status().isNoContent());
+    }
+    var unauthed = List.of(MockUser.DEFAULT,
+            MockUser.UNMATCH_CUSTOMER);
+    for (var user : unauthed) {
+      mvc
+              .perform(
+                      put(EndpointConstants.API_V_0_1_TICKETS + "/cancel/"
+                              + mockTicket.getId())
+                              .header("Authorization", getJwt(user)))
+              .andExpect(status().isForbidden());
+    }
+    mvc
+            .perform(
+                    get(EndpointConstants.API_V_0_1_TICKETS + "/cancel/"
+                            + mockTicket.getId()))
+            .andExpect(status().isForbidden());
+  }
+
   enum MockUser {
     DEFAULT("default@test.com", "ROLE_DEFAULT", UUID.randomUUID().toString()),
     MATCH_CUSTOMER("eddy_grant@test.com", "ROLE_CUSTOMER", "a4a9feca-bfe7-4c45-8319-7cb6cdd359db"),
