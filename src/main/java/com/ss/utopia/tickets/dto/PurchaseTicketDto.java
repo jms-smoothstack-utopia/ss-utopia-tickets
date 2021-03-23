@@ -35,6 +35,7 @@ public class PurchaseTicketDto {
             .passengerName(ticket.getPassengerName())
             .seatClass(ticket.getSeatClass())
             .seatNumber(ticket.getSeatNumber())
+            .flightTime(ticket.getFlightTime())
             .status(TicketStatus.PURCHASED)
             .build())
         .collect(Collectors.toList());
