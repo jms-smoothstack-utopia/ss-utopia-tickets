@@ -1,5 +1,6 @@
 package com.ss.utopia.tickets.dto;
 
+import java.time.ZonedDateTime;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,4 +19,6 @@ public class TicketItem {
   private String seatNumber;
   @NotBlank
   private String passengerName;
+  @NotBlank
+  private ZonedDateTime flightTime;
 }

@@ -11,7 +11,7 @@
   </parent>
   <groupId>com.github.jms-smoothstack-utopia</groupId>
   <artifactId>ss-utopia-tickets</artifactId>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <name>Utopia Tickets API</name>
   <description>API for ticket purchase and management</description>
   <properties>
