@@ -8,5 +8,6 @@ import java.util.List;
 
 @Component
 public interface EmailClient {
-    void sendPurchaseTicketConfirmation(String recipientEmail, List<Ticket> ticketsPurchased);
+
+  void sendPurchaseTicketConfirmation(String recipientEmail, List<Ticket> ticketsPurchased);
 }

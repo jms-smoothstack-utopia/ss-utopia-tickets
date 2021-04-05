@@ -8,20 +8,20 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR, reason = "Email was not sent by AWS")
 public class EmailNotSentException extends RuntimeException {
 
-    private final String responseBody;
-    private final HttpStatus statusCode;
+  private final String responseBody;
+  private final HttpStatus statusCode;
 
-    public EmailNotSentException(String body, HttpStatus statusCode) {
-        this.responseBody = body;
-        this.statusCode = statusCode;
-    }
+  public EmailNotSentException(String body, HttpStatus statusCode) {
+    this.responseBody = body;
+    this.statusCode = statusCode;
+  }
 
-    public Optional<String> getResponseBody() {
-        return Optional.ofNullable(responseBody);
-    }
+  public Optional<String> getResponseBody() {
+    return Optional.ofNullable(responseBody);
+  }
 
-    public Optional<HttpStatus> getStatusCode() {
-        return Optional.ofNullable(statusCode);
-    }
+  public Optional<HttpStatus> getStatusCode() {
+    return Optional.ofNullable(statusCode);
+  }
 }
 

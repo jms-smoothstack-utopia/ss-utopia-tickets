@@ -24,44 +24,44 @@ import java.util.List;
 @ConfigurationProperties(value = "com.ss.utopia.email", ignoreUnknownFields = false)
 public class RestTemplateEmailClient implements EmailClient {
 
-    @Setter
-    private String sesEndpoint;
+  @Setter
+  private String sesEndpoint;
 
-    @Setter
-    private String ticketsBaseURL;
+  @Setter
+  private String ticketsBaseURL;
 
-    private RestTemplateBuilder builder;
-    private RestTemplate restTemplate;
+  private RestTemplateBuilder builder;
+  private RestTemplate restTemplate;
 
-    @Autowired
-    public void setBuilder(RestTemplateBuilder builder) {
-        this.builder = builder;
+  @Autowired
+  public void setBuilder(RestTemplateBuilder builder) {
+    this.builder = builder;
+  }
+
+  @PostConstruct
+  public void postConstruct() {
+    restTemplate = builder.build();
+  }
+
+  @Override
+  public void sendPurchaseTicketConfirmation(String recipientEmail, List<Ticket> ticketsPurchased) {
+    var email = new TicketConfirmationEmail(recipientEmail, ticketsBaseURL);
+    var response = restTemplate.postForEntity(sesEndpoint, email, String.class);
+    handleResponse(response, email);
+  }
+
+  private void handleResponse(ResponseEntity<String> response, AbstractUrlEmail email) {
+    if (response == null) {
+      throw new EmailNotSentException("NULL RESPONSE", HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-    @PostConstruct
-    public void postConstruct() {
-        restTemplate = builder.build();
+    if (response.getStatusCode().is2xxSuccessful()) {
+      log.debug("Email sent to: " + email.getRecipient());
+      log.debug(email.getSubject());
+    } else {
+      log.error("Unable to send confirmation email.");
+      log.error("Status code: " + response.getStatusCode().value());
+      log.error("Response body: " + response.getBody());
+      throw new EmailNotSentException(response.getBody(), response.getStatusCode());
     }
-
-    @Override
-    public void sendPurchaseTicketConfirmation(String recipientEmail, List<Ticket> ticketsPurchased) {
-        var email = new TicketConfirmationEmail(recipientEmail, ticketsBaseURL);
-        var response = restTemplate.postForEntity(sesEndpoint, email, String.class);
-        handleResponse(response, email);
-    }
-
-    private void handleResponse(ResponseEntity<String> response, AbstractUrlEmail email) {
-        if (response == null) {
-            throw new EmailNotSentException("NULL RESPONSE", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        if (response.getStatusCode().is2xxSuccessful()) {
-            log.debug("Email sent to: " + email.getRecipient());
-            log.debug(email.getSubject());
-        } else {
-            log.error("Unable to send confirmation email.");
-            log.error("Status code: " + response.getStatusCode().value());
-            log.error("Response body: " + response.getBody());
-            throw new EmailNotSentException(response.getBody(), response.getStatusCode());
-        }
-    }
+  }
 }
