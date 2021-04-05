@@ -1,5 +1,6 @@
 package com.ss.utopia.tickets.service;
 
+import com.ss.utopia.tickets.client.EmailClient;
 import com.ss.utopia.tickets.dto.PurchaseTicketDto;
 import com.ss.utopia.tickets.entity.Ticket;
 import com.ss.utopia.tickets.entity.Ticket.TicketStatus;
@@ -10,14 +11,18 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TicketsServiceImpl implements TicketService {
 
   private final TicketsRepository repository;
+  private final EmailClient emailClient;
 
   @Override
   public List<Ticket> getAllTickets() {
@@ -48,10 +53,16 @@ public class TicketsServiceImpl implements TicketService {
 
   @Override
   public List<Ticket> purchaseTickets(PurchaseTicketDto purchaseTicketDto) {
-    return purchaseTicketDto.mapToEntity()
-        .stream()
-        .map(repository::save)
-        .collect(Collectors.toList());
+
+    String email = purchaseTicketDto.getEmail();
+    log.info(email);
+    List<Ticket> purchasedTickets = purchaseTicketDto.mapToEntity()
+            .stream()
+            .map(repository::save)
+            .collect(Collectors.toList());
+
+    emailClient.sendPurchaseTicketConfirmation(email, purchasedTickets);
+    return purchasedTickets;
   }
 
   @Override
