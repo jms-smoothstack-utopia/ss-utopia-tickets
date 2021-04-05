@@ -4,7 +4,8 @@ public class TicketConfirmationEmail extends AbstractUrlEmail {
 
   private static final String DEFAULT_SUBJECT = "Utopia Tickets Confirmation";
   private static final String DEFAULT_MESSAGE =
-      "Thanks for purchasing tickets from us! Please use this link to look at your new upcoming flights!";
+      "Thanks for purchasing tickets from us! Please use this link to look"
+          + " at your new upcoming flights!";
 
   public TicketConfirmationEmail(String recipient, String url) {
     this(recipient, DEFAULT_SUBJECT, DEFAULT_MESSAGE, url);

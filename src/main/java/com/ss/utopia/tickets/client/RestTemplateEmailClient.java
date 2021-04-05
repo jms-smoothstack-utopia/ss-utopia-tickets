@@ -12,10 +12,9 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import com.ss.utopia.tickets.client.email.TicketConfirmationEmail;
-
 import javax.annotation.PostConstruct;
+import org.springframework.web.client.RestTemplate;
 import java.util.List;
 
 @Slf4j

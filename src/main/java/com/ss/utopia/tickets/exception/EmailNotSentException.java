@@ -11,6 +11,10 @@ public class EmailNotSentException extends RuntimeException {
   private final String responseBody;
   private final HttpStatus statusCode;
 
+  /**
+   * @param body
+   * @param statusCode
+   */
   public EmailNotSentException(String body, HttpStatus statusCode) {
     this.responseBody = body;
     this.statusCode = statusCode;

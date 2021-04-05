@@ -30,6 +30,9 @@ public class PurchaseTicketDto {
   @NotEmpty
   private List<TicketItem> tickets;
 
+  /**
+   * @return a List of tickets which we for booking a ticket
+   */
   public List<Ticket> mapToEntity() {
     return tickets.stream()
         .map(ticket -> Ticket.builder()

@@ -1,10 +1,8 @@
 package com.ss.utopia.tickets.client;
 
-
+import java.util.List;
 import com.ss.utopia.tickets.entity.Ticket;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Component
 public interface EmailClient {
