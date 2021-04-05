@@ -84,7 +84,7 @@ public class TicketsControllerSecurityTests {
 
   PurchaseTicketDto mockDto = PurchaseTicketDto.builder()
       .flightId(1L)
-      .purchaserId(mockTicket.getPurchaserId())
+      .purchaserId(mockTicket.getPurchaserId()).email("test@test.com")
       .tickets(List.of(TicketItem.builder()
                            .seatClass(mockTicket.getSeatClass())
                            .seatNumber(mockTicket.getSeatNumber())
