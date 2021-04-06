@@ -5,12 +5,10 @@ import com.ss.utopia.tickets.entity.Ticket;
 import com.ss.utopia.tickets.security.permissions.AdminOnlyPermission;
 import com.ss.utopia.tickets.security.permissions.EmployeeOnlyPermission;
 import com.ss.utopia.tickets.service.TicketService;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.validation.Valid;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
