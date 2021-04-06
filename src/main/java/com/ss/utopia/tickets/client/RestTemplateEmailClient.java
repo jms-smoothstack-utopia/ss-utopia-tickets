@@ -1,8 +1,11 @@
 package com.ss.utopia.tickets.client;
 
 import com.ss.utopia.tickets.client.email.AbstractUrlEmail;
+import com.ss.utopia.tickets.client.email.TicketConfirmationEmail;
 import com.ss.utopia.tickets.entity.Ticket;
 import com.ss.utopia.tickets.exception.EmailNotSentException;
+import java.util.List;
+import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +14,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import com.ss.utopia.tickets.client.email.TicketConfirmationEmail;
-import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
-import java.util.List;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
