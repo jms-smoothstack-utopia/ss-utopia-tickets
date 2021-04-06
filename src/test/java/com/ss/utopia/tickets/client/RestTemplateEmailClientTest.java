@@ -36,7 +36,7 @@ public class RestTemplateEmailClientTest {
         Mockito.verify(restTemplateBuilder).build();
 
         emailClient.setSesEndpoint(mockSesEndpoint);
-        emailClient.setTicketsBaseURL(mockBookedFlights);
+        emailClient.setTicketsBaseUrl(mockBookedFlights);
     }
 
     @Test

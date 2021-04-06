@@ -8,11 +8,6 @@ public class BadStatusUpdateException extends IllegalStateException {
   private final TicketStatus currentStatus;
   private final TicketStatus requestedStatus;
 
-  /**
-   * @param ticketId
-   * @param currentStatus
-   * @param requestedStatus
-   */
   public BadStatusUpdateException(Long ticketId,
       TicketStatus currentStatus,
       TicketStatus requestedStatus) {

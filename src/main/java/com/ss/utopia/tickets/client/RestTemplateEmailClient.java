@@ -11,11 +11,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import com.ss.utopia.tickets.client.email.TicketConfirmationEmail;
 import javax.annotation.PostConstruct;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.stereotype.Service;
 import java.util.List;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,7 +27,7 @@ public class RestTemplateEmailClient implements EmailClient {
   private String sesEndpoint;
 
   @Setter
-  private String ticketsBaseURL;
+  private String ticketsBaseUrl;
 
   private RestTemplateBuilder builder;
   private RestTemplate restTemplate;
@@ -44,7 +44,7 @@ public class RestTemplateEmailClient implements EmailClient {
 
   @Override
   public void sendPurchaseTicketConfirmation(String recipientEmail, List<Ticket> ticketsPurchased) {
-    var email = new TicketConfirmationEmail(recipientEmail, ticketsBaseURL);
+    var email = new TicketConfirmationEmail(recipientEmail, ticketsBaseUrl);
     var response = restTemplate.postForEntity(sesEndpoint, email, String.class);
     handleResponse(response, email);
   }

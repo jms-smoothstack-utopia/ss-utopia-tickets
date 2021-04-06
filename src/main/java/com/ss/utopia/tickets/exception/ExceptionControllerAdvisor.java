@@ -15,10 +15,6 @@ public class ExceptionControllerAdvisor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionControllerAdvisor.class);
 
-  /**
-   * @param ex
-   * @return
-   */
   @ResponseStatus(HttpStatus.NOT_FOUND)
   @ExceptionHandler(NoSuchElementException.class)
   public Map<String, Object> noSuchElementException(NoSuchElementException ex) {
@@ -31,10 +27,6 @@ public class ExceptionControllerAdvisor {
     return response;
   }
 
-  /**
-   * @param ex
-   * @return
-   */
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(BadStatusUpdateException.class)
   public Map<String, Object> badStatusUpdateException(BadStatusUpdateException ex) {

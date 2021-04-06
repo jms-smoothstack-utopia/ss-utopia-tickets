@@ -1,7 +1,7 @@
 package com.ss.utopia.tickets.client;
 
-import java.util.List;
 import com.ss.utopia.tickets.entity.Ticket;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
