@@ -44,7 +44,7 @@ public class TicketsController {
   }
 
   @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE','TRAVEL_AGENT')"
-          + " OR @customerAuthenticationManager.customerIdMatches(authentication, #customerId)")
+      + " OR @customerAuthenticationManager.customerIdMatches(authentication, #customerId)")
   @GetMapping(value = "/history/{customerId}",
       produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<List<Ticket>> getPastTicketsForCustomer(@PathVariable UUID customerId) {
@@ -57,9 +57,9 @@ public class TicketsController {
   }
 
   @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE','TRAVEL_AGENT')"
-          + " OR @customerAuthenticationManager.customerIdMatches(authentication, #customerId)")
+      + " OR @customerAuthenticationManager.customerIdMatches(authentication, #customerId)")
   @GetMapping(value = "/upcoming/{customerId}",
-          produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+      produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
   public ResponseEntity<List<Ticket>> getUpcomingTicketsForCustomer(@PathVariable UUID customerId) {
     log.info("GET upcoming tickets for customer=" + customerId);
     List<Ticket> upcomingTickets = service.getUpcomingTicketsByCustomerId(customerId);
@@ -82,7 +82,7 @@ public class TicketsController {
       + " OR @customerAuthenticationManager.customerIdMatches(authentication, #purchaseTicketDto)")
   @PostMapping
   public ResponseEntity<List<Ticket>> purchaseTickets(
-          @Valid @RequestBody PurchaseTicketDto purchaseTicketDto) {
+      @Valid @RequestBody PurchaseTicketDto purchaseTicketDto) {
     log.info("POST new ticket");
     var tickets = service.purchaseTickets(purchaseTicketDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(tickets);

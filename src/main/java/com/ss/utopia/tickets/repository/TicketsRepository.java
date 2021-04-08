@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TicketsRepository extends JpaRepository<Ticket, Long> {
+
   List<Ticket> findByPurchaserId(UUID purchaserId);
 }

@@ -2,34 +2,26 @@ package com.ss.utopia.tickets.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import com.ss.utopia.tickets.client.EmailClient;
 import com.ss.utopia.tickets.dto.PurchaseTicketDto;
 import com.ss.utopia.tickets.dto.TicketItem;
 import com.ss.utopia.tickets.exception.BadStatusUpdateException;
 import com.ss.utopia.tickets.exception.NoSuchTicketException;
 import com.ss.utopia.tickets.repository.TicketsRepository;
 import com.ss.utopia.tickets.entity.Ticket;
-import java.net.URI;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.time.ZonedDateTime;
 
-import com.ss.utopia.tickets.service.TicketService;
-import com.ss.utopia.tickets.service.TicketsServiceImpl;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.http.ResponseEntity;
 
 class TicketsServiceImplUnitTest {
 
@@ -42,7 +34,8 @@ class TicketsServiceImplUnitTest {
     private final static ZonedDateTime mockPast = mockTime.minus(6, ChronoUnit.MONTHS);
     private final static ZonedDateTime mockFuture = mockTime.plus(6, ChronoUnit.MONTHS);
     private final TicketsRepository repository = Mockito.mock(TicketsRepository.class);
-    private final TicketService service = new TicketsServiceImpl(repository);
+    private final EmailClient emailClient = Mockito.mock(EmailClient.class);
+    private final TicketService service = new TicketsServiceImpl(repository, emailClient);
 
     @BeforeAll
     static void beforeAll() {

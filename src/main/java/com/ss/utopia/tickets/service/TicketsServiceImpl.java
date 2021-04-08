@@ -1,5 +1,6 @@
 package com.ss.utopia.tickets.service;
 
+import com.ss.utopia.tickets.client.EmailClient;
 import com.ss.utopia.tickets.dto.PaymentCreateDto;
 import com.ss.utopia.tickets.dto.PurchaseTicketDto;
 import com.ss.utopia.tickets.entity.Ticket;
@@ -19,15 +20,18 @@ import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @ConfigurationProperties(prefix = "com.ss.utopia.tickets.service")
 public class TicketsServiceImpl implements TicketService {
 
   private final TicketsRepository repository;
+  private final EmailClient emailClient;
 
   //a setter is needed for Spring Boot to bind a configuration property
   @Getter @Setter
@@ -41,17 +45,17 @@ public class TicketsServiceImpl implements TicketService {
   @Override
   public List<Ticket> getPastTicketsByCustomerId(UUID customerId) {
     return repository.findByPurchaserId(customerId)
-            .stream()
-            .filter(thisTicket -> thisTicket.getFlightTime().isBefore(ZonedDateTime.now()))
-            .collect(Collectors.toList());
+        .stream()
+        .filter(thisTicket -> thisTicket.getFlightTime().isBefore(ZonedDateTime.now()))
+        .collect(Collectors.toList());
   }
 
   @Override
   public List<Ticket> getUpcomingTicketsByCustomerId(UUID customerId) {
     return repository.findByPurchaserId(customerId)
-            .stream()
-            .filter(thisTicket -> thisTicket.getFlightTime().isAfter(ZonedDateTime.now()))
-            .collect(Collectors.toList());
+        .stream()
+        .filter(thisTicket -> thisTicket.getFlightTime().isAfter(ZonedDateTime.now()))
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -62,11 +66,17 @@ public class TicketsServiceImpl implements TicketService {
 
   @Override
   public List<Ticket> purchaseTickets(PurchaseTicketDto purchaseTicketDto) {
-    //call initiatePayment and such here
-    return purchaseTicketDto.mapToEntity()
+
+    String email = purchaseTicketDto.getEmail();
+    log.info(email);
+    List<Ticket> purchasedTickets = purchaseTicketDto.mapToEntity()
         .stream()
         .map(repository::save)
         .collect(Collectors.toList());
+
+    //call initiatePayment and such here
+    emailClient.sendPurchaseTicketConfirmation(email, purchasedTickets);
+    return purchasedTickets;
   }
 
   @Override
@@ -98,5 +108,4 @@ public class TicketsServiceImpl implements TicketService {
     ticket.setStatus(TicketStatus.CHECKED_IN);
     repository.save(ticket);
   }
-
 }

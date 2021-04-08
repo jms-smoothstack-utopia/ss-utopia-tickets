@@ -14,7 +14,7 @@ public class CustomerAuthenticationManager {
   private final TicketsRepository ticketsRepository;
 
   public boolean customerIdMatches(Authentication authentication,
-                                   PurchaseTicketDto purchaseTicketDto) {
+      PurchaseTicketDto purchaseTicketDto) {
     try {
       var jwtPrincipal = (JwtPrincipal) authentication.getPrincipal();
       return jwtPrincipal.getUserId().equals(purchaseTicketDto.getPurchaserId());
