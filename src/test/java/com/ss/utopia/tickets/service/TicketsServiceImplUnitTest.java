@@ -2,12 +2,15 @@ package com.ss.utopia.tickets.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.ss.utopia.tickets.client.EmailClient;
+import com.ss.utopia.tickets.dto.PaymentCreateDto;
 import com.ss.utopia.tickets.dto.PurchaseTicketDto;
 import com.ss.utopia.tickets.dto.TicketItem;
 import com.ss.utopia.tickets.exception.BadStatusUpdateException;
+import com.ss.utopia.tickets.exception.CaughtStripeException;
 import com.ss.utopia.tickets.exception.NoSuchTicketException;
 import com.ss.utopia.tickets.repository.TicketsRepository;
 import com.ss.utopia.tickets.entity.Ticket;
@@ -18,6 +21,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.time.ZonedDateTime;
 
+import com.stripe.model.PaymentIntent;
+import com.stripe.net.RequestOptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +40,7 @@ class TicketsServiceImplUnitTest {
     private final static ZonedDateTime mockFuture = mockTime.plus(6, ChronoUnit.MONTHS);
     private final TicketsRepository repository = Mockito.mock(TicketsRepository.class);
     private final EmailClient emailClient = Mockito.mock(EmailClient.class);
-    private final TicketService service = new TicketsServiceImpl(repository, emailClient);
+    private final TicketsServiceImpl service = new TicketsServiceImpl(repository, emailClient);
 
     @BeforeAll
     static void beforeAll() {
@@ -177,6 +182,29 @@ class TicketsServiceImplUnitTest {
         var expectedTickets = List.of(firstTicket);
 
         assertEquals(expectedTickets, purchasedTickets);
+    }
+
+    @Test
+    void test_initiatePayment_getsAPaymentIntent() {
+        PaymentCreateDto mockDto = PaymentCreateDto.builder()
+                .amount(1000L)
+                .email("foo@bar.com")
+                .build();
+        service.setStripeKey("sk_test_4eC39HqLyjWDarjtT1zdp7dc"); //public test key from Stripe docs
+
+        PaymentIntent returnedIntent = service.initiatePayment(mockDto);
+        assertEquals("foo@bar.com", returnedIntent.getReceiptEmail());
+    }
+
+    @Test
+    void test_initiatePayment_catchesStripeException() {
+        PaymentCreateDto mockDto = PaymentCreateDto.builder()
+                .amount(1000L)
+                .email("foo@bar.com")
+                .build();
+        service.setStripeKey("bad"); //a bad API key, obviously
+
+        assertThrows(CaughtStripeException.class, () -> service.initiatePayment(mockDto));
     }
 
 }

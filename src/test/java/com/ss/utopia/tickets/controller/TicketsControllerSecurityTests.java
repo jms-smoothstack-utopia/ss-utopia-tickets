@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ss.utopia.tickets.dto.PaymentCreateDto;
 import com.ss.utopia.tickets.dto.PurchaseTicketDto;
 import com.ss.utopia.tickets.dto.TicketItem;
 import com.ss.utopia.tickets.entity.Ticket;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.stripe.model.PaymentIntent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -84,7 +86,9 @@ public class TicketsControllerSecurityTests {
             .status(TicketStatus.PURCHASED)
             .build();
 
-    PurchaseTicketDto mockDto = PurchaseTicketDto.builder()
+    PaymentIntent mockPaymentIntent = Mockito.mock(PaymentIntent.class);
+
+    PurchaseTicketDto mockPurchaseDto = PurchaseTicketDto.builder()
             .flightId(1L)
             .purchaserId(mockTicket.getPurchaserId()).email("test@test.com")
             .tickets(List.of(TicketItem.builder()
@@ -92,6 +96,11 @@ public class TicketsControllerSecurityTests {
                     .seatNumber(mockTicket.getSeatNumber())
                     .passengerName(mockTicket.getPassengerName())
                     .build()))
+            .build();
+
+    PaymentCreateDto mockPaymentDto = PaymentCreateDto.builder()
+            .amount(1000L)
+            .email("test@test.com")
             .build();
 
     @BeforeEach
@@ -115,11 +124,12 @@ public class TicketsControllerSecurityTests {
 
         when(ticketService.getAllTickets()).thenReturn(List.of(mockTicket));
         when(ticketService.getTicketById(mockTicket.getId())).thenReturn(mockTicket);
-        when(ticketService.purchaseTickets(mockDto)).thenReturn(List.of(mockTicket));
+        when(ticketService.purchaseTickets(mockPurchaseDto)).thenReturn(List.of(mockTicket));
         when(ticketService.getUpcomingTicketsByCustomerId(UUID.fromString(MockUser.MATCH_CUSTOMER.id)))
                 .thenReturn(List.of(mockTicket));
         when(ticketService.getPastTicketsByCustomerId(UUID.fromString(MockUser.MATCH_CUSTOMER.id)))
                 .thenReturn(List.of(mockPastTicket));
+        when(ticketService.initiatePayment(mockPaymentDto)).thenReturn(mockPaymentIntent);
 
         when(ticketsRepository.findById(mockTicket.getId())).thenReturn(Optional.of(mockTicket));
     }
@@ -204,7 +214,7 @@ public class TicketsControllerSecurityTests {
                     .perform(
                             post(EndpointConstants.API_V_0_1_TICKETS)
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .content(new ObjectMapper().writeValueAsString(mockDto))
+                                    .content(new ObjectMapper().writeValueAsString(mockPurchaseDto))
                                     .header("Authorization", getJwt(user)))
                     .andExpect(status().isCreated());
         }
@@ -215,7 +225,7 @@ public class TicketsControllerSecurityTests {
                     .perform(
                             post(EndpointConstants.API_V_0_1_TICKETS)
                                     .contentType(MediaType.APPLICATION_JSON)
-                                    .content(new ObjectMapper().writeValueAsString(mockDto))
+                                    .content(new ObjectMapper().writeValueAsString(mockPurchaseDto))
                                     .header("Authorization", getJwt(user)))
                     .andExpect(status().isForbidden());
         }
@@ -224,7 +234,7 @@ public class TicketsControllerSecurityTests {
                 .perform(
                         post(EndpointConstants.API_V_0_1_TICKETS)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(new ObjectMapper().writeValueAsString(mockDto)))
+                                .content(new ObjectMapper().writeValueAsString(mockPurchaseDto)))
                 .andExpect(status().isForbidden());
     }
 
@@ -349,6 +359,26 @@ public class TicketsControllerSecurityTests {
                 .perform(
                         get(EndpointConstants.API_V_0_1_TICKETS + "/cancel/"
                                 + mockTicket.getId()))
+                .andExpect(status().isForbidden());
+    }
+
+    //these permissions are likely to change as Stripe use is expanded upon
+    @Test
+    void test_doPayment_CanBePerformedByAnyUser() throws Exception {
+        for (var user : MockUser.values()) {
+            mvc
+                    .perform(
+                            post(EndpointConstants.API_V_0_1_TICKETS + "/pay")
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(new ObjectMapper().writeValueAsString(mockPaymentDto))
+                                    .header("Authorization", getJwt(user)))
+                    .andExpect(status().isCreated());
+        }
+        mvc
+                .perform(
+                        post(EndpointConstants.API_V_0_1_TICKETS + "/pay")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(new ObjectMapper().writeValueAsString(mockPaymentDto)))
                 .andExpect(status().isForbidden());
     }
 
