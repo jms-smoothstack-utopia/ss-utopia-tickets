@@ -38,4 +38,18 @@ public class ExceptionControllerAdvisor {
 
     return response;
   }
+
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ExceptionHandler(CaughtStripeException.class)
+  public Map<String, Object> caughtStripeException(CaughtStripeException ex) {
+    LOGGER.error(ex.getMessage());
+    var response = new HashMap<String, Object>();
+
+    response.put("error", ex.getMessage());
+    response.put("Stripe code", ex.getStripeCode());
+    response.put("Stripe type", ex.getStripeErrorType());
+    response.put("status", HttpStatus.BAD_REQUEST);
+
+    return response;
+  }
 }
