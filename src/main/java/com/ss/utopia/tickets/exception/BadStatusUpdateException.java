@@ -9,10 +9,10 @@ public class BadStatusUpdateException extends IllegalStateException {
   private final TicketStatus requestedStatus;
 
   public BadStatusUpdateException(Long ticketId,
-                                  TicketStatus currentStatus,
-                                  TicketStatus requestedStatus) {
+      TicketStatus currentStatus,
+      TicketStatus requestedStatus) {
     super("Cannot update ticket id=" + ticketId + " to status " + requestedStatus
-            + ", already " + currentStatus);
+        + ", already " + currentStatus);
     this.ticketId = ticketId;
     this.currentStatus = currentStatus;
     this.requestedStatus = requestedStatus;

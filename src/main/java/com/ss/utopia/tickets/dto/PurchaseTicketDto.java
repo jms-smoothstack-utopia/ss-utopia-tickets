@@ -24,6 +24,9 @@ public class PurchaseTicketDto {
   @NotNull
   private Long flightId;
 
+  @NotNull
+  private String email;
+
   @NotEmpty
   private List<TicketItem> tickets;
 
