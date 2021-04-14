@@ -1,5 +1,6 @@
 package com.ss.utopia.tickets.controller;
 
+import com.ss.utopia.tickets.dto.PaymentCreateDto;
 import com.ss.utopia.tickets.dto.PurchaseTicketDto;
 import com.ss.utopia.tickets.entity.Ticket;
 import com.ss.utopia.tickets.security.permissions.AdminOnlyPermission;
@@ -103,5 +104,15 @@ public class TicketsController {
     log.info("PUT id=" + id);
     service.checkIn(id);
     return ResponseEntity.noContent().build();
+  }
+
+  @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN', 'EMPLOYEE', 'TRAVEL_AGENT', 'DEFAULT')")
+  @PostMapping("/pay")
+  public ResponseEntity<String> doPayment(
+          @Valid @RequestBody PaymentCreateDto paymentCreateDto) {
+    log.info("Doing payment test");
+    //StripeResponse objects don't have a built-in serializer, so parse them as JSON here
+    String paymentIntentJson = service.initiatePayment(paymentCreateDto).toJson();
+    return ResponseEntity.status(HttpStatus.CREATED).body(paymentIntentJson);
   }
 }

@@ -1,27 +1,41 @@
 package com.ss.utopia.tickets.service;
 
 import com.ss.utopia.tickets.client.EmailClient;
+import com.ss.utopia.tickets.dto.PaymentCreateDto;
 import com.ss.utopia.tickets.dto.PurchaseTicketDto;
 import com.ss.utopia.tickets.entity.Ticket;
 import com.ss.utopia.tickets.entity.Ticket.TicketStatus;
 import com.ss.utopia.tickets.exception.BadStatusUpdateException;
+import com.ss.utopia.tickets.exception.CaughtStripeException;
 import com.ss.utopia.tickets.exception.NoSuchTicketException;
 import com.ss.utopia.tickets.repository.TicketsRepository;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
+import com.stripe.net.RequestOptions;
+import com.stripe.param.PaymentIntentCreateParams;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@ConfigurationProperties(prefix = "com.ss.utopia.tickets.service")
 public class TicketsServiceImpl implements TicketService {
 
   private final TicketsRepository repository;
   private final EmailClient emailClient;
+
+  //a setter is needed for Spring Boot to bind a configuration property
+  @Getter @Setter
+  private String stripeKey;
 
   @Override
   public List<Ticket> getAllTickets() {
@@ -60,6 +74,7 @@ public class TicketsServiceImpl implements TicketService {
         .map(repository::save)
         .collect(Collectors.toList());
 
+    //call initiatePayment and such here
     emailClient.sendPurchaseTicketConfirmation(email, purchasedTickets);
     return purchasedTickets;
   }
@@ -74,6 +89,17 @@ public class TicketsServiceImpl implements TicketService {
     ticket.setStatus(TicketStatus.CANCELLED);
     //for future payment integration: fire off a refund request to the processor here
     repository.save(ticket);
+  }
+
+  @Override
+  public PaymentIntent initiatePayment(PaymentCreateDto paymentCreateDto) {
+    PaymentIntentCreateParams createParams = paymentCreateDto.buildPaymentCreate();
+    RequestOptions options = RequestOptions.builder().setApiKey(this.stripeKey).build();
+    try {
+      return PaymentIntent.create(createParams, options);
+    } catch (StripeException e) {
+      throw new CaughtStripeException(e);
+    }
   }
 
   @Override

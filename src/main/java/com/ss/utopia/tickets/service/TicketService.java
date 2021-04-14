@@ -1,7 +1,9 @@
 package com.ss.utopia.tickets.service;
 
+import com.ss.utopia.tickets.dto.PaymentCreateDto;
 import com.ss.utopia.tickets.dto.PurchaseTicketDto;
 import com.ss.utopia.tickets.entity.Ticket;
+import com.stripe.model.PaymentIntent;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,4 +22,6 @@ public interface TicketService {
   void checkIn(Long ticketId);
 
   void cancelTicket(Long ticketId);
+
+  PaymentIntent initiatePayment(PaymentCreateDto paymentCreateDto);
 }

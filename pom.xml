@@ -94,6 +94,12 @@
       <artifactId>spring-cloud-starter-openfeign</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>com.stripe</groupId>
+      <artifactId>stripe-java</artifactId>
+      <version>20.46.0</version>
+    </dependency>
+
     <!-- SECURITY DEPENDENCIES -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
